@@ -7,9 +7,9 @@ Project Structure
 -----------------
 
 SmartShoppingSystem-backend/\
-├── **recommendation-service**/    # Handles product recommendations (Hexagonal)\
+├── recommendation-service/    # Handles product recommendations (Hexagonal)\
 ├── product-catalog-service/   # Manages products and inventory (Hexagonal)\
-├── user-service/              # Manages users and preferences (Onion)
+├── **user-service**/              # Manages users and preferences (Onion)
 
 ---
 
@@ -27,40 +27,43 @@ SmartShoppingSystem-backend/\
 | **Onion Arch**       | Used in User Service                         |
 
 ---
-# Recommendation Service
+# User Service
 
-The **Recommendation Service** is a crucial component of the SmartShoppingSystem. It consumes user activity events, processes them, and provides personalized product recommendations. The service follows the **Hexagonal Architecture**, ensuring separation between the core business logic and external systems (like Kafka or databases).
+The **User Service** manages user accounts, preferences, and profiles. It serves as a core component of the SmartShoppingSystem by allowing users to register, update preferences, and interact with personalized recommendations. The service follows the **Onion Architecture**, which ensures a clear separation of concerns and improves maintainability by isolating core business logic from infrastructure details.
 
 ---
 
 ## 🧠 Responsibilities
 
-- Consume user activity events from Kafka.
-- Provide personalized product recommendations via a RESTful API.
-- Process data to generate dynamic, personalized product recommendations.
-- Publish events (e.g., product recommendations generated) to Kafka.
+- Manage user accounts, profiles, and preferences.
+- Provide APIs for user authentication and profile management.
+- Interact with other services like **Recommendation Service** to fetch personalized product feeds.
+- Ensure data security and privacy for users.
 
 ---
 
 ## 🧱 Architecture Overview
 
-The service follows **Hexagonal (Ports and Adapters) Architecture**, which includes:
+The service follows **Onion Architecture**, which includes:
 
-- **Domain Layer**: Core logic for recommendation generation.
-- **Application Layer**: Use cases for managing recommendations.
-- **Adapters**:
-    - **Inbound**: REST controllers to expose APIs for product recommendations.
-    - **Outbound**: Kafka consumers to handle events like user activity and product events.
-- **Ports**: Interfaces that abstract the infrastructure like Kafka and REST APIs.
+- **Core Domain Layer**: Contains the business logic for managing users and preferences. This layer is independent of the outer layers.
+- **Application Layer**: Orchestrates the user-related use cases and services, such as user registration, authentication, and preference updates.
+- **Infrastructure Layer**:
+    - **Adapters**: External services like REST APIs for communication with other microservices (e.g., Recommendation Service).
+    - **Persistence**: Repositories and database access.
+
+The core domain logic remains isolated and free from infrastructure concerns, enabling a more maintainable and flexible system.
 
 ---
 
+
 ## 📡 REST Endpoints
 
-| Method | Endpoint               | Description                        |
-|--------|------------------------|------------------------------------|
-| GET    | `/recommendations`      | Get product recommendations        |
-| GET    | `/recommendations/{userId}` | Get personalized recommendations for a user |
+| Method | Endpoint                      | Description                        |
+|--------|-------------------------------|------------------------------------|
+| POST   | `/users`                      | Register a new user        |
+| GET    | `/users/{userId}`             | Get user profile by ID |
+| PUT    | `/users/{userId}/preferences` | Update user preferences |
 
 ---
 
@@ -82,7 +85,7 @@ The **Recommendation Service** produces events on relevant Kafka topics to keep 
 
 1. **Navigate to the service folder**:
    ```bash
-   cd recommendation-service
+   cd user-service
 
 
 1. **Build the service:r**:
